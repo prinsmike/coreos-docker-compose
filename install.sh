@@ -70,7 +70,7 @@ run() {
 
 	mkdir -p /opt/bin
 
-	curl -L "https://github.com/docker/compose/releases/download/${COMPOSEVERSION}-$(uname -s)-$(uname -m)" -o /opt/bin/docker-compose
+	curl -s -L "https://github.com/docker/compose/releases/download/${COMPOSEVERSION}-$(uname -s)-$(uname -m)" -o /opt/bin/docker-compose
 
 	chmod +x /opt/bin/docker-compose
 
