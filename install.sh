@@ -77,3 +77,5 @@ run() {
 	docker-compose -v
 }
 
+main $@
+
