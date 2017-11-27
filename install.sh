@@ -1,18 +1,79 @@
 #!/usr/bin/env bash
 
+V="1.0.0" # The version number of this script.
+
+PROG=$0
+COMPOSEVERSION=""
+
 if [[ $EUID -ne 0 ]]; then
 	echo "This script must be run as root."
 	exit 1
 fi
 
-mkdir -p /opt/bin
+main() {
 
-curl -L "https://github.com/docker/compose/releases/download/1.16.1/docker-compose-$(uname -s)-$(uname -m)" -o /opt/bin/docker-compose
+	while getopts ":hVv:" opt; do
+		case ${opt} in
+			h )
+				usage
+				exit 0
+				;;
+			V )
+				version
+				exit 0
+				;;
+			v )
+				COMPOSEVERSION=$OPTARG # set the docker compose version.
+				;;
+			\? )
+				echo "Invalid option: -$OPTARG" 1>&2
+				echo
+				usage
+				exit 1
+				;;
+			: )
+				echo "Invalid option: -$OPTARG requires an argument" 1>&2
+				echo
+				usage
+				exit 1
+				;;
+		esac
+	done
+	shift $((OPTIND -1))
 
-chmod +x /opt/bin/docker-compose
+	run
+}
 
-# Test
+usage() {
+	echo "Usage: $PROG"
+	echo "      Install docker-compose on CoreOS Container Linux."
+	echo "  -v"
+	echo "      Supply the docker-compose version number to install."
+	echo "  -h"
+	echo "      Display this help message."
+	echo "  -V"
+	echo "      Display this script's version number and exit."
+}
 
-docker -v
+version() {
+	echo "$PROG version $V"
+}
 
-docker-compose -v
+run() {
+	if [[ -z "$COMPOSEVERSION" ]]; then
+		echo "You must supply a docker-compose version number to install."
+		echo "See https://github.com/docker/compose/releases for available releases."
+		exit 1
+	fi
+
+	mkdir -p /opt/bin
+
+	curl -L "https://github.com/docker/compose/releases/download/${COMPOSEVERSION}-$(uname -s)-$(uname -m)" -o /opt/bin/docker-compose
+
+	chmod +x /opt/bin/docker-compose
+
+	docker -v
+
+	docker-compose -v
+}
+
