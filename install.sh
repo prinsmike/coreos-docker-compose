@@ -63,6 +63,8 @@ run() {
 	if [[ -z "$COMPOSEVERSION" ]]; then
 		echo "You must supply a docker-compose version number to install."
 		echo "See https://github.com/docker/compose/releases for available releases."
+		echo
+		usage
 		exit 1
 	fi
 
